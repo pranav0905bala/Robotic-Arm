@@ -1,7 +1,7 @@
 # 3-DOF Robotic Arm
 
 ## Overview
-This project involved designing and building a 3-degree-of-freedom robotic arm for basic object manipulation and motion control. The system combines mechanical design, embedded systems, and real-time control for multi-axis movement.
+This project involved designing and building a 3-degree-of-freedom robotic arm for pick-and-place purposes. The system combines mechanical design, embedded systems, and real-time control for multi-axis movement.
 
 ## Problem Statement
 Designing a robotic arm requires coordination between mechanical structure, actuator control, and embedded system programming. The goal was to create a functional robotic prototype capable of smooth and controlled motion.
