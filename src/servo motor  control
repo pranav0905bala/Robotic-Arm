@@ -8,9 +8,9 @@ int initialPosition1 = 0;
 int initialPosition2 = 0;
 int initialPosition3 = 90;
 
-int desiredPosition1 = 90;
-int desiredPosition2 = 90;
-int desiredPosition3 = 60;
+int desiredPosition1 = x2;
+int desiredPosition2 = y2;
+int desiredPosition3 = z2;
 
 int stepSize1 = 5;
 int stepSize2 = 5;
