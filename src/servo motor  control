@@ -1,0 +1,93 @@
+#include <Servo.h>
+
+Servo servo1;
+Servo servo2;
+Servo servo3;
+
+int initialPosition1 = 0;
+int initialPosition2 = 0;
+int initialPosition3 = 90;
+
+int desiredPosition1 = 90;
+int desiredPosition2 = 90;
+int desiredPosition3 = 60;
+
+int stepSize1 = 5;
+int stepSize2 = 5;
+int stepSize3 = 5;
+
+int stepDelay = 50;
+
+bool returnToInitial = false;
+
+int currentPos1 = initialPosition1;
+int currentPos2 = initialPosition2;
+int currentPos3 = initialPosition3;
+
+void setup() {
+  Serial.begin(9600);
+
+  servo1.attach(9);
+  servo2.attach(10);
+  servo3.attach(11);
+
+  servo1.write(currentPos1);
+  servo2.write(currentPos2);
+  servo3.write(currentPos3);
+}
+
+void loop() {
+  if (!returnToInitial) {
+    moveServos(desiredPosition1, desiredPosition2, desiredPosition3);
+
+    if (currentPos1 == desiredPosition1 &&
+        currentPos2 == desiredPosition2 &&
+        currentPos3 == desiredPosition3) {
+
+      Serial.println("Reached desired position. Press any key to return.");
+
+      while (!Serial.available());
+      while (Serial.available()) Serial.read();
+
+      returnToInitial = true;
+    }
+  } else {
+    moveServos(initialPosition1, initialPosition2, initialPosition3);
+
+    if (currentPos1 == initialPosition1 &&
+        currentPos2 == initialPosition2 &&
+        currentPos3 == initialPosition3) {
+
+      Serial.println("Returned to initial position.");
+      delay(1000);
+      returnToInitial = false;
+    }
+  }
+}
+
+void moveServos(int target1, int target2, int target3) {
+  while (currentPos1 != target1 ||
+         currentPos2 != target2 ||
+         currentPos3 != target3) {
+
+    if (currentPos1 < target1) currentPos1 += stepSize1;
+    else if (currentPos1 > target1) currentPos1 -= stepSize1;
+
+    if (currentPos2 < target2) currentPos2 += stepSize2;
+    else if (currentPos2 > target2) currentPos2 -= stepSize2;
+
+    if (currentPos3 < target3) currentPos3 += stepSize3;
+    else if (currentPos3 > target3) currentPos3 -= stepSize3;
+
+    // Prevent overshooting
+    currentPos1 = constrain(currentPos1, min(currentPos1, target1), max(currentPos1, target1));
+    currentPos2 = constrain(currentPos2, min(currentPos2, target2), max(currentPos2, target2));
+    currentPos3 = constrain(currentPos3, min(currentPos3, target3), max(currentPos3, target3));
+
+    servo1.write(currentPos1);
+    servo2.write(currentPos2);
+    servo3.write(currentPos3);
+
+    delay(stepDelay);
+  }
+}
