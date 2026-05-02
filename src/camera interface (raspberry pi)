@@ -1,0 +1,103 @@
+import cv2
+import numpy as np
+import serial
+import time
+
+# ---------------- SERIAL SETUP ----------------
+# Change '/dev/ttyUSB0' if needed (check using: ls /dev/tty*)
+ser = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+time.sleep(2)  # Allow Arduino to reset
+
+# ---------------- CAMERA SETUP ----------------
+cap = cv2.VideoCapture(0)
+
+if not cap.isOpened():
+    print("Error: Could not open camera")
+    exit()
+
+# ---------------- MAIN LOOP ----------------
+while True:
+    ret, frame = cap.read()
+
+    if not ret:
+        print("Error: Can't receive frame")
+        break
+
+    # Flip frame if camera is upside down (optional)
+    frame = cv2.flip(frame, 0)
+
+    # Get frame dimensions
+    h, w, _ = frame.shape
+
+    # ---------------- CROSSHAIR ----------------
+    cv2.line(frame, (w//2, 0), (w//2, h), (0,255,0), 1)
+    cv2.line(frame, (0, h//2), (w, h//2), (0,255,0), 1)
+
+    # ---------------- COLOR DETECTION ----------------
+    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+    # Red color range (lower + upper range)
+    lower_red1 = np.array([0, 120, 70])
+    upper_red1 = np.array([10, 255, 255])
+
+    lower_red2 = np.array([170, 120, 70])
+    upper_red2 = np.array([180, 255, 255])
+
+    mask1 = cv2.inRange(hsv, lower_red1, upper_red1)
+    mask2 = cv2.inRange(hsv, lower_red2, upper_red2)
+
+    mask = mask1 + mask2
+
+    # Remove noise
+    mask = cv2.GaussianBlur(mask, (5,5), 0)
+
+    # ---------------- FIND OBJECT ----------------
+    contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+
+    object_found = False
+
+    for cnt in contours:
+        area = cv2.contourArea(cnt)
+
+        if area > 500:  # Filter small noise
+            x, y, w_box, h_box = cv2.boundingRect(cnt)
+
+            # Draw bounding box
+            cv2.rectangle(frame, (x,y), (x+w_box,y+h_box), (0,0,255), 2)
+
+            # Object center
+            cx = x + w_box // 2
+            cy = y + h_box // 2
+
+            # Draw center point
+            cv2.circle(frame, (cx, cy), 5, (255,0,0), -1)
+
+            # Show coordinates
+            cv2.putText(frame, f"X:{cx} Y:{cy}", (x, y-10),
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0,255,0), 2)
+
+            # ---------------- SEND DATA TO ARDUINO ----------------
+            data = f"{cx},{cy}\n"
+            ser.write(data.encode())
+
+            print(f"Sent: {data.strip()}")
+
+            object_found = True
+            break
+
+    # If no object found, send -1
+    if not object_found:
+        ser.write(b"-1,-1\n")
+
+    # ---------------- DISPLAY ----------------
+    cv2.imshow("Robot Arm Vision", frame)
+    cv2.imshow("Mask", mask)
+
+    # Exit on 'q'
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# ---------------- CLEANUP ----------------
+cap.release()
+cv2.destroyAllWindows()
+ser.close()
