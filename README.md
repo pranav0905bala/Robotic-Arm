@@ -1,10 +1,24 @@
 # 3-DOF Bomb-Defusal Robotic Arm
 
 ## Overview
-This project involved designing and building a 3-degree-of-freedom robotic arm for pick-and-place purposes. The system combines mechanical design, embedded systems, and real-time control for multi-axis movement.
+This project presents a remotely operated robotic arm designed for hazardous environments such as bomb defusal. The system minimizes human interaction with dangerous objects by enabling remote manipulation and wire-cutting operations.
 
-## Problem Statement
+## Objective
+To design and develop a remotely controlled low-cost robotic arm capable of performing precise manipulation tasks in hazardous environments.
+
 Designing a robotic arm requires coordination between mechanical structure, actuator control, and embedded system programming. The goal was to create a functional robotic prototype capable of smooth and controlled motion.
+
+## Working Principle
+- Live camera feed provides visual feedback to the user  
+- User sends control commands remotely  
+- Robotic arm aligns to the required position  
+- End-effector performs manipulation (e.g., wire cutting)
+
+## System Overview
+- Remote operator (safe zone)
+- Robotic arm (hazardous zone)
+- Camera module for live video feedback
+- Control interface for actuation
 
 ## System Architecture
 - Mechanical arm designed using SolidWorks
