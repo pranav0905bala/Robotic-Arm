@@ -1,4 +1,4 @@
-# 3-DOF Robotic Arm
+# 3-DOF Bomb-Defusal Robotic Arm
 
 ## Overview
 This project involved designing and building a 3-degree-of-freedom robotic arm for pick-and-place purposes. The system combines mechanical design, embedded systems, and real-time control for multi-axis movement.
